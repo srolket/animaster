@@ -24,6 +24,31 @@ function addListeners() {
             const block = document.getElementById('scaleBlock');
             animaster().scale(block, 1000, 1.25);
         });
+
+    document.getElementById('moveAndHidePlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('moveAndHideBlock');
+            animaster().moveAndHide(block, 5000);
+        });
+
+    document.getElementById('showAndHidePlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('showAndHideBlock');
+            animaster().showAndHide(block, 5000);
+        });
+
+    let stop;
+
+    document.getElementById('heartBeatingPlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('heartBeatingBlock');
+            stop = animaster().heartBeating(block).stop;
+        });
+    document.getElementById('heartBeatingStop')
+        .addEventListener('click', function () {
+            const block = document.getElementById('heartBeatingBlock');
+            stop();
+        });
 }
 
 /**
@@ -66,10 +91,12 @@ function animaster() {
             element.classList.remove('hide');
             element.classList.add('show');
         },
+
         move: (element, duration, translation) => {
             element.style.transitionDuration = `${duration}ms`;
             element.style.transform = getTransform(translation, null);
         },
+
         scale: (element, duration, ratio) => {
             element.style.transitionDuration =  `${duration}ms`;
             element.style.transform = getTransform(null, ratio);
@@ -79,6 +106,29 @@ function animaster() {
             element.style.transitionDuration =  `${duration}ms`;
             element.classList.remove('show');
             element.classList.add('hide');
+        },
+
+        moveAndHide: (element, duration) => {
+            animaster().move(element, 0.4 * duration, {x: 100, y: 20});
+            animaster().fadeOut(element, 0.6 * duration);
+        },
+
+        showAndHide: (element, duration) => {
+            animaster().fadeIn(element, duration / 3);
+            setTimeout(animaster().fadeOut, duration / 3, element, duration / 3);
+        },
+
+        heartBeating: (element) => {
+            const intervalId = setInterval(() => {
+                animaster().scale(element, 500, 1.4);
+                setTimeout(() => {
+                    animaster().scale(element, 500, 1);
+                }, 500);
+            }, 1000)
+
+            return {
+                stop: () => clearInterval(intervalId)
+            }
         }
     }
 }
