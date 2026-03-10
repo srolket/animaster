@@ -86,39 +86,35 @@ function scale(element, duration, ratio) {
 
 function animaster() {
     return {
-        fadeIn: (element, duration) => {
-            element.style.transitionDuration =  `${duration}ms`;
-            element.classList.remove('hide');
-            element.classList.add('show');
+        _steps: [],
+
+        fadeIn(element, duration) {
+            this.addFadeIn(duration).play(element);
         },
 
-        move: (element, duration, translation) => {
-            element.style.transitionDuration = `${duration}ms`;
-            element.style.transform = getTransform(translation, null);
+        move(element, duration, translation) {
+            this.addMove(duration, translation).play(element);
         },
 
-        scale: (element, duration, ratio) => {
-            element.style.transitionDuration =  `${duration}ms`;
-            element.style.transform = getTransform(null, ratio);
+        scale(element, duration, ratio) {
+            this.addScale(duration, ratio).play(element);
         },
 
-        fadeOut: (element, duration) => {
-            element.style.transitionDuration =  `${duration}ms`;
-            element.classList.remove('show');
-            element.classList.add('hide');
+        fadeOut(element, duration) {
+            this.addFadeOut(duration).play(element);
         },
 
-        moveAndHide: (element, duration) => {
+        moveAndHide(element, duration) {
             animaster().move(element, 0.4 * duration, {x: 100, y: 20});
             animaster().fadeOut(element, 0.6 * duration);
         },
 
-        showAndHide: (element, duration) => {
+        showAndHide(element, duration) {
             animaster().fadeIn(element, duration / 3);
             setTimeout(animaster().fadeOut, duration / 3, element, duration / 3);
         },
 
-        heartBeating: (element) => {
+        heartBeating(element) {
             const intervalId = setInterval(() => {
                 animaster().scale(element, 500, 1.4);
                 setTimeout(() => {
@@ -128,6 +124,62 @@ function animaster() {
 
             return {
                 stop: () => clearInterval(intervalId)
+            }
+        },
+
+        addMove(duration, translation) {
+            this._steps.push({
+                name: 'move',
+                duration: duration,
+                params: translation,
+            });
+            return this;
+        },
+
+        addScale(duration, ratio) {
+            this._steps.push({
+                name: 'scale',
+                duration: duration,
+                params: ratio,
+            })
+            return this;
+        },
+
+        addFadeIn(duration) {
+            this._steps.push({
+                name: 'fadeIn',
+                duration: duration,
+                params: null,
+            })
+            return this;
+        },
+
+        addFadeOut(duration) {
+            this._steps.push({
+                name: 'fadeOut',
+                duration: duration,
+                params: null,
+            })
+            return this;
+        },
+
+        play(element) {
+            for (step of this._steps) {
+                if (step.name === 'move') {
+                    element.style.transitionDuration = `${step.duration}ms`;
+                    element.style.transform = getTransform(step.params, null);
+                } else if (step.name === 'scale') {
+                    element.style.transitionDuration =  `${step.duration}ms`;
+                    element.style.transform = getTransform(null, step.params);
+                } else if (step.name === 'fadeIn') {
+                    element.style.transitionDuration =  `${step.duration}ms`;
+                    element.classList.remove('hide');
+                    element.classList.add('show');
+                } else if (step.name === 'fadeOut') {
+                    element.style.transitionDuration =  `${step.duration}ms`;
+                    element.classList.remove('show');
+                    element.classList.add('hide');
+                }
             }
         }
     }
