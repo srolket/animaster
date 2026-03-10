@@ -67,6 +67,10 @@ function animaster() {
         scale: (element, duration, ratio) => {
             element.style.transitionDuration =  `${duration}ms`;
             element.style.transform = getTransform(null, ratio);
+        },
+        moveAndHide: (element, duration) => {
+            animaster().move(element, 0.4 * duration, {x: 100, y: 20});
+            animaster().fadeOut(element, 0.6 * duration);
         }
     }
 }
