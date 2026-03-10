@@ -84,6 +84,15 @@ function addListeners() {
 
     document.getElementById('worryAnimationBlock')
         .addEventListener('click', worryAnimationHandler);
+
+    const borderRadiusHandler = animaster()
+        .addBorderRadius(1000, 50)
+        .addBorderRadius(1000, 0)
+        .buildHandler();
+    
+
+    document.getElementById('borderRadiusBlock')
+        .addEventListener('click', borderRadiusHandler);
 }
 
 
@@ -155,6 +164,15 @@ function animaster() {
             return this;
         },
 
+        addBorderRadius(duration, ratio) {
+            this._steps.push({
+                name: 'borderRadius',
+                duration: duration,
+                params: ratio,
+            })
+            return this;
+        },
+
         addFadeIn(duration) {
             this._steps.push({
                 name: 'fadeIn',
@@ -197,6 +215,9 @@ function animaster() {
                                 break;
                             case 'scale':
                                 element.style.transform = getTransform(null, step.params);
+                                break;
+                            case 'borderRadius':
+                                element.style.borderRadius = step.params + 'px';
                                 break;
                             case 'fadeIn':
                                 element.classList.remove('hide');
