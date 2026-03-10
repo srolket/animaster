@@ -84,6 +84,36 @@ function addListeners() {
 
     document.getElementById('worryAnimationBlock')
         .addEventListener('click', worryAnimationHandler);
+
+    const a = animaster().addMove(111, {x: 10, y: -10})
+    const b = a.addFadeOut(400);
+
+    document.getElementById('APlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('ABlock');
+            a.play(block)
+        });
+
+    const testBlock = document.getElementById('Block');
+
+    document.getElementById('APlay')
+        .addEventListener('click', function () {
+            a.play(testBlock)
+        });
+
+    document.getElementById('BPlay')
+        .addEventListener('click', function () {
+            b.play(testBlock)
+        });
+
+    const borderRadiusHandler = animaster()
+        .addBorderRadius(1000, 50)
+        .addBorderRadius(1000, 0)
+        .buildHandler();
+
+
+    document.getElementById('borderRadiusBlock')
+        .addEventListener('click', borderRadiusHandler);
 }
 
 
@@ -99,6 +129,13 @@ function animaster() {
     const resetMoveAndScale = (element) => {
         element.style.transform = null;  
     }
+
+    const clone = (steps) => {
+        const newAnim = animaster();
+        newAnim._steps = steps;
+        return newAnim;
+    };
+
     return {
         _steps: [],
 
@@ -138,44 +175,70 @@ function animaster() {
         },
 
         addMove(duration, translation) {
-            this._steps.push({
+            const newSteps = this._steps.slice();
+
+            newSteps.push({
                 name: 'move',
                 duration: duration,
-                params: translation,
+                params: translation
             });
-            return this;
+
+            return clone(newSteps);
         },
 
         addScale(duration, ratio) {
-            this._steps.push({
+            const newSteps = this._steps.slice();
+
+            newSteps.push({
                 name: 'scale',
+                duration: duration,
+                params: ratio
+            });
+
+            return clone(newSteps);
+        },
+
+        addBorderRadius(duration, ratio) {
+            const newSteps = this._steps.slice();
+            newSteps.push({
+                name: 'borderRadius',
                 duration: duration,
                 params: ratio,
             })
-            return this;
+            return clone(newSteps);
         },
 
         addFadeIn(duration) {
-            this._steps.push({
+            const newSteps = this._steps.slice();
+
+            newSteps.push({
                 name: 'fadeIn',
-                duration: duration,
-                params: null,
-            })
-            return this;
+                duration: duration
+            });
+
+            return clone(newSteps);
         },
 
         addFadeOut(duration) {
-            this._steps.push({
+            const newSteps = this._steps.slice();
+
+            newSteps.push({
                 name: 'fadeOut',
-                duration: duration,
-                params: null,
-            })
-            return this;
+                duration: duration
+            });
+
+            return clone(newSteps);
         },
 
         addDelay(duration) {
-            this._steps.push({ name: 'delay', duration });
-            return this;
+            const newSteps = this._steps.slice();
+
+            newSteps.push({
+                name: 'delay',
+                duration: duration
+            });
+
+            return clone(newSteps);
         },
 
         play(element, cycled = false) {
@@ -197,6 +260,9 @@ function animaster() {
                                 break;
                             case 'scale':
                                 element.style.transform = getTransform(null, step.params);
+                                break;
+                            case 'borderRadius':
+                                element.style.borderRadius = step.params + 'px';
                                 break;
                             case 'fadeIn':
                                 element.classList.remove('hide');
